@@ -1,0 +1,15 @@
+#python 
+
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+#Node
+
+frontend/node_modules
+npm-debug.log
+
+backend/instance/
+
