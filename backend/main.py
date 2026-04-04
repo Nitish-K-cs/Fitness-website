@@ -16,8 +16,7 @@ def get_exercises():
             "name": e.name,
             "set1": e.set1,
             "set2": e.set2,
-            "set3": e.set3,
-            "video_url": e.video_url
+            "set3": e.set3
         } for e in exercises
     ])
 

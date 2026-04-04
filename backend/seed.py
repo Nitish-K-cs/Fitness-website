@@ -7,11 +7,11 @@ def seed_exercises():
         return
 
     exercises = [
-        {"name": "Dumbbell Rows", "set1": 10, "set2": 10, "set3": 10, "video_url": "/static/workout.mp4"},
-        {"name": "Dumbbell Chest Press", "set1": 10, "set2": 10, "set3": 10, "video_url": "/static/workout.mp4"},
-        {"name": "Shoulder Press", "set1": 10, "set2": 10, "set3": 10, "video_url": "/static/workout.mp4"},
-        {"name": "Biceps Curls", "set1": 10, "set2": 10, "set3": 10, "video_url": "/static/workout.mp4"},
-        {"name": "Tricep Extension", "set1": 10, "set2": 10, "set3": 10, "video_url": "/static/workout.mp4"},
+        {"name": "Dumbbell Rows", "set1": 10, "set2": 10, "set3": 10,},
+        {"name": "Dumbbell Chest Press", "set1": 10, "set2": 10, "set3": 10},
+        {"name": "Shoulder Press", "set1": 10, "set2": 10, "set3": 10},
+        {"name": "Biceps Curls", "set1": 10, "set2": 10, "set3": 10},
+        {"name": "Tricep Extension", "set1": 10, "set2": 10, "set3": 10},
     ]
 
     for ex in exercises:

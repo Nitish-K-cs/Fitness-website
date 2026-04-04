@@ -16,7 +16,6 @@ class Exercise(db.Model):
     set1 = db.Column(db.Integer)
     set2 = db.Column(db.Integer)
     set3 = db.Column(db.Integer)
-    video_url = db.Column(db.String(255))
 
 class WorkoutLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
