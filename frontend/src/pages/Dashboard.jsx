@@ -204,8 +204,14 @@ export default function Dashboard() {
         <div className="brand">KINETIC<br /><span>PRECISION</span></div>
         <nav className="sidebar-nav">
           {['DASHBOARD', 'WORKOUTS', 'METRICS', 'RECOVERY', 'SETTINGS'].map(item => (
-            <a key={item} className={`nav-item ${item === 'DASHBOARD' ? 'active' : ''}`}>{item}</a>
-          ))}
+            <a
+              key={item}
+              href={item === 'METRICS' ? '/Tracker' : '#'}
+              className={`nav-item ${item === 'DASHBOARD' ? 'active' : ''}`}
+                  >
+                {item}
+                </a>
+            ))}
         </nav>
         <div className="session-progress">
           <div className="progress-label">SESSION PROGRESS</div>

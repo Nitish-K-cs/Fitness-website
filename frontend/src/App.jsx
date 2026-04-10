@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
+import Tracker from './pages/Tracker'
 import './App.css'
 
 export default function App() {
@@ -8,6 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/Dashboard" replace />} />
         <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Tracker" element={<Tracker />} />
       </Routes>
     </BrowserRouter>
   )
