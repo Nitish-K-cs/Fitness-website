@@ -514,15 +514,258 @@
   50%       { opacity: 0.25; }
 }
 
+/* ─── Portfolio Switcher ─────────────────────────────── */
+.portfolio-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.portfolio-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.portfolio-pill:hover { color: var(--text); background: var(--bg3); }
+
+.portfolio-pill.pill-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.pill-icon { font-size: 14px; }
+.pill-label { letter-spacing: 0.1em; }
+
+/* ─── Mobile Top Bar ─────────────────────────────────── */
+.mobile-topbar {
+  display: none; /* desktop: hidden */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 56px;
+  flex-shrink: 0;
+  background: #0a0a0a;
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.mtb-brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.mtb-name {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--accent2);
+}
+.mtb-sub {
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+.mtb-progress {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-family: var(--font-head);
+  font-weight: 900;
+}
+.mtb-count  { font-size: 26px; color: var(--text); }
+.mtb-sep    { font-size: 14px; color: var(--dim); }
+.mtb-total  { font-size: 16px; color: var(--muted); }
+
 /* ─── Responsive ─────────────────────────────────────── */
 @media (max-width: 1100px) {
   .dash-shell { grid-template-columns: 160px 190px 1fr; }
   .card-top { grid-template-columns: 1fr 260px; }
 }
-@media (max-width: 800px) {
-  .dash-shell { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; position: static; }
+
+/* ── Mobile breakpoint (768px) ── */
+@media (max-width: 768px) {
+
+  /* Shell: switch from 3-col grid to flex column */
+  .dash-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    height: 100vh; /* fallback for older Androids */
+    overflow: hidden;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  /* Show mobile top bar */
+  .mobile-topbar { display: flex; }
+
+  /* Hide desktop sidebar */
   .sidebar { display: none; }
-  .circuit-panel { height: auto; }
-  .cards-area { height: auto; padding: 16px 12px 80px; }
-  .card-top { grid-template-columns: 1fr; }
+
+  /* ── Circuit panel → horizontal scroll strip ── */
+  .circuit-panel {
+    flex-shrink: 0;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-top: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .circuit-panel::-webkit-scrollbar { display: none; }
+
+  .circuit-title { display: none; }
+
+  .circuit-list {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    min-width: max-content;
+  }
+
+  .circuit-item {
+    flex-direction: column;
+    min-width: 72px;
+    padding: 10px 8px 8px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+  }
+  .circuit-item.circuit-active {
+    border-bottom-color: var(--accent);
+    background: rgba(240, 82, 42, 0.07);
+  }
+  .circuit-item.circuit-done { opacity: 0.5; border-bottom-color: var(--accent2); }
+
+  .circuit-num  { font-size: 15px; min-width: auto; }
+  .circuit-info { align-items: center; }
+  .circuit-tag  { font-size: 7px; }
+  .circuit-name { font-size: 9px; max-width: 68px; }
+  .circuit-dot  { width: 14px; height: 14px; font-size: 7px; }
+
+  /* ── Cards area fills remaining space ── */
+  .cards-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 14px 84px; /* bottom pad clears floating-next + bnav */
+    height: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Session header ── */
+  .session-header { margin-bottom: 14px; }
+  .session-tag    { font-size: 9px; }
+  .session-title  { font-size: 22px; }
+
+  /* ── Portfolio switcher: full-width pill on mobile ── */
+  .portfolio-switcher {
+    display: flex;
+    width: 100%;
+    margin-top: 12px;
+  }
+  .portfolio-pill {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+
+  /* ── Exercise card ── */
+  .exercise-card {
+    opacity: 1;         /* don't dim upcoming cards on small screens */
+    transform: none;    /* no scaling */
+    border-radius: 10px;
+  }
+  .exercise-card.card-active  { transform: none; }
+
+  .card-top {
+    grid-template-columns: 1fr;
+    padding: 16px 16px 12px;
+    gap: 12px;
+  }
+
+  .exercise-name { font-size: 24px; }
+
+  .video-wrapper { width: 100%; border-radius: 8px; }
+
+  /* ── Sets row ── */
+  .set-block { padding: 14px 10px 10px; }
+
+  .rep-input {
+    font-size: 52px;
+    /* 16px+ on mobile prevents iOS/Android from zooming on focus.
+       The input is already visually large so readability is fine. */
+  }
+
+  .start-set-btn {
+    padding: 9px 10px;
+    font-size: 10px;
+    min-height: 36px;
+  }
+  .timer-stop-btn {
+    padding: 9px 10px;
+    font-size: 10px;
+    min-height: 36px;
+  }
+
+  /* ── Card footer: stack buttons vertically ── */
+  .card-footer {
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 14px 16px;
+  }
+  .submit-btn,
+  .next-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 24px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+
+  /* ── Floating next: full-width, above bottom nav ── */
+  .floating-next {
+    bottom: 72px;
+    left: 14px;
+    right: 14px;
+    width: auto;
+    transform: none;
+    text-align: center;
+  }
+  @keyframes float-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Session complete ── */
+  .session-complete { padding: 32px 20px; margin-top: 20px; }
+  .complete-title   { font-size: 32px; }
 }
+

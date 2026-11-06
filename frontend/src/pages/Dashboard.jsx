@@ -1,13 +1,53 @@
 import { useState, useEffect, useRef } from 'react'
 import './Dashboard.css'
+import { saveWorkoutLog } from '../services/storage'
+import BottomNav from '../components/BottomNav'
 
-const MOCK_EXERCISES = [
-  { id: 1, name: 'Bicep Curls',      target_sets: 3, target_reps: 12, video_url: '/videos/Bicep-Curls.mp4' },
-  { id: 2, name: 'Dumbbell Chest',   target_sets: 3, target_reps: 12, video_url: '/videos/Dumbbell-chest-press.mp4' },
-  { id: 3, name: 'Dumbbell Rows',    target_sets: 3, target_reps: 10, video_url: '/videos/Dumbell-rows.mp4' },
-  { id: 4, name: 'Shoulder Press',   target_sets: 3, target_reps: 12, video_url: '/videos/Shoulder-press.mp4' },
-  { id: 5, name: 'Tricep Extension', target_sets: 3, target_reps: 10, video_url: '/videos/Tricep-extension.mp4' },
-]
+/* ── Portfolios ───────────────────────────────────────── */
+const PORTFOLIOS = {
+  dumbbell: {
+    key: 'dumbbell',
+    label: 'Dumbbell',
+    icon: '🏋️',
+    exercises: [
+      { id: 1, name: 'Bicep Curls',      target_sets: 3, target_reps: 12, video_url: '/videos/Bicep-Curls.mp4' },
+      { id: 2, name: 'Dumbbell Chest',   target_sets: 3, target_reps: 12, video_url: '/videos/Dumbbell-chest-press.mp4' },
+      { id: 3, name: 'Dumbbell Rows',    target_sets: 3, target_reps: 10, video_url: '/videos/Dumbell-rows.mp4' },
+      { id: 4, name: 'Shoulder Press',   target_sets: 3, target_reps: 12, video_url: '/videos/Shoulder-press.mp4' },
+      { id: 5, name: 'Tricep Extension', target_sets: 3, target_reps: 10, video_url: '/videos/Tricep-extension.mp4' },
+    ],
+  },
+  bodyweight: {
+    key: 'bodyweight',
+    label: 'Bodyweight',
+    icon: '💪',
+    exercises: [
+      { id: 6,  name: 'Leg Jumps',            target_sets: 3, target_reps: 10, video_url: '/videos/leg-workout.mp4' },
+      { id: 7,  name: 'Lateral Raises',        target_sets: 3, target_reps: 10, video_url: '/videos/Lateral-tricep.mp4' },
+      { id: 8,  name: 'PushUp Chest',          target_sets: 3, target_reps: 10, video_url: '/videos/PushUp-chest.mp4' },
+      { id: 9,  name: 'Tricep Pushups',        target_sets: 3, target_reps: 10, video_url: '/videos/Tricep-pushups.mp4' },
+      { id: 10, name: 'Dips & Table Pull-Ups', target_sets: 3, target_reps: 10, video_url: '/videos/dips-tablePullUps.mp4' },
+    ],
+  },
+}
+
+/* ── PortfolioSwitcher ────────────────────────────────── */
+function PortfolioSwitcher({ selected, onChange }) {
+  return (
+    <div className="portfolio-switcher">
+      {Object.values(PORTFOLIOS).map(p => (
+        <button
+          key={p.key}
+          className={`portfolio-pill ${selected === p.key ? 'pill-active' : ''}`}
+          onClick={() => onChange(p.key)}
+        >
+          <span className="pill-icon">{p.icon}</span>
+          <span className="pill-label">{p.label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
 
 /* ── SetTimer ─────────────────────────────────────────── */
 function SetTimer({ isActive, onStop }) {
@@ -66,7 +106,7 @@ function SetInput({ setNum, value, onChange, duration, onStartSet, onStopSet, is
 }
 
 /* ── ExerciseCard ─────────────────────────────────────── */
-function ExerciseCard({ exercise, isActive, isCompleted, onComplete, onNext, isLast }) {
+function ExerciseCard({ exercise, portfolio, isActive, isCompleted, onComplete, onNext, isLast }) {
   const [sets, setSets] = useState({ set1: '', set2: '', set3: '' })
   const [durations, setDurations] = useState({ set1: 0, set2: 0, set3: 0 })
   const [runningSet, setRunningSet] = useState(null)
@@ -86,22 +126,16 @@ function ExerciseCard({ exercise, isActive, isCompleted, onComplete, onNext, isL
 
   const allDone = sets.set1 && sets.set2 && sets.set3
 
-  const handleSubmit = async () => {
-    try {
-      await fetch('http://127.0.0.1:5000/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          exercise_id: exercise.id,
-          set1: parseInt(sets.set1) || 0,
-          set2: parseInt(sets.set2) || 0,
-          set3: parseInt(sets.set3) || 0,
-          duration: durations.set1 + durations.set2 + durations.set3,
-        }),
-      })
-    } catch {
-      console.warn('Backend unavailable — logged locally.')
-    }
+  const handleSubmit = () => {
+    saveWorkoutLog({
+      exerciseId:   exercise.id,
+      exerciseName: exercise.name,
+      portfolio,
+      set1:     parseInt(sets.set1) || 0,
+      set2:     parseInt(sets.set2) || 0,
+      set3:     parseInt(sets.set3) || 0,
+      duration: durations.set1 + durations.set2 + durations.set3,
+    })
     setSubmitted(true)
     onComplete()
   }
@@ -170,36 +204,42 @@ function ExerciseCard({ exercise, isActive, isCompleted, onComplete, onNext, isL
 
 /* ── Dashboard (default export) ───────────────────────── */
 export default function Dashboard() {
-  const [exercises, setExercises] = useState([])
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [completed, setCompleted] = useState(new Set())
-  const [loading, setLoading] = useState(true)
+  const [selectedPortfolio, setSelectedPortfolio] = useState('dumbbell')
+  const [activeIndex, setActiveIndex]             = useState(0)
+  const [completed, setCompleted]                 = useState(new Set())
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/exercises')
-      .then(r => r.json())
-      .then(data => {
-        setExercises(Array.isArray(data) && data.length ? data : MOCK_EXERCISES)
-        setLoading(false)
-      })
-      .catch(() => { setExercises(MOCK_EXERCISES); setLoading(false) })
-  }, [])
+  // Derive exercises from the active portfolio
+  const exercises = PORTFOLIOS[selectedPortfolio].exercises
+
+  // Reset session state whenever the portfolio changes
+  const handlePortfolioChange = (key) => {
+    setSelectedPortfolio(key)
+    setActiveIndex(0)
+    setCompleted(new Set())
+  }
 
   const markComplete = i => setCompleted(prev => new Set([...prev, i]))
-  const goNext = i => { if (i + 1 < exercises.length) setActiveIndex(i + 1) }
-
-  if (loading) return (
-    <div className="loading-screen">
-      <div className="loading-text">LOADING PROTOCOL...</div>
-    </div>
-  )
+  const goNext       = i => { if (i + 1 < exercises.length) setActiveIndex(i + 1) }
 
   const pct = exercises.length ? (completed.size / exercises.length) * 100 : 0
 
   return (
     <div className="dash-shell">
 
-      {/* ── Sidebar ── */}
+      {/* ── Mobile top bar (hidden on desktop via CSS) ── */}
+      <div className="mobile-topbar">
+        <div className="mtb-brand">
+          <span className="mtb-name">KINETIC</span>
+          <span className="mtb-sub">PRECISION</span>
+        </div>
+        <div className="mtb-progress">
+          <span className="mtb-count">{completed.size}</span>
+          <span className="mtb-sep">/</span>
+          <span className="mtb-total">{exercises.length}</span>
+        </div>
+      </div>
+
+      {/* ── Sidebar (desktop only) ── */}
       <aside className="sidebar">
         <div className="brand">KINETIC<br /><span>PRECISION</span></div>
         <nav className="sidebar-nav">
@@ -208,10 +248,10 @@ export default function Dashboard() {
               key={item}
               href={item === 'METRICS' ? '/Tracker' : '#'}
               className={`nav-item ${item === 'DASHBOARD' ? 'active' : ''}`}
-                  >
-                {item}
-                </a>
-            ))}
+            >
+              {item}
+            </a>
+          ))}
         </nav>
         <div className="session-progress">
           <div className="progress-label">SESSION PROGRESS</div>
@@ -222,7 +262,7 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* ── Circuit panel ── */}
+      {/* ── Circuit panel (vertical on desktop, horizontal strip on mobile) ── */}
       <div className="circuit-panel">
         <div className="circuit-title">WORKOUT CIRCUIT</div>
         <ul className="circuit-list">
@@ -250,13 +290,15 @@ export default function Dashboard() {
         <div className="session-header">
           <span className="session-tag">ATHLETE_01 · ELITE_STATUS</span>
           <h1 className="session-title">TODAY'S CIRCUIT</h1>
+          <PortfolioSwitcher selected={selectedPortfolio} onChange={handlePortfolioChange} />
         </div>
 
         <div className="cards-stack">
           {exercises.map((ex, i) => (
             <ExerciseCard
-              key={ex.id}
+              key={`${selectedPortfolio}-${ex.id}`}
               exercise={ex}
+              portfolio={selectedPortfolio}
               isActive={i === activeIndex}
               isCompleted={completed.has(i)}
               isLast={i === exercises.length - 1}
@@ -280,6 +322,9 @@ export default function Dashboard() {
           NEXT EXERCISE →
         </button>
       )}
+
+      {/* ── Bottom nav (mobile only, hidden on desktop via CSS) ── */}
+      <BottomNav />
     </div>
   )
 }
